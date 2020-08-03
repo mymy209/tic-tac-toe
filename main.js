@@ -17,89 +17,80 @@ const WINNING_IDX = [
 let board = [];
 
 const player1 = {
-    value: 1, 
     name: '', 
-    sign: 'X'
+    sign: 'O'
 };
 const player2 = {
-    value: -1, 
     name: '',
-    sign: 'O'
+    sign: 'X'
 };
 
 let turn; 
 
-let neededGridUpdate;
 
 /*----- cached element references -----*/
 const msgEl = document.getElementById('msg');
 const replayEl = document.getElementById('replay');
-const gridEl = document.querySelector('.' + neededGridUpdate); 
+let gridOnScreen = document.querySelectorAll('div');
+//const turnEl = document.getElementById('turn'); 
 
 /*----- event listeners -----*/
 document.querySelector('.grid').addEventListener('click', handleGridClick);
+replayEl.addEventListener('click', init);
 
 /*----- functions -----*/
 function handleGridClick(e) {
-    let gridClassName = e.target.className; 
-    neededGridUpdate = gridClassName;
-    console.log(neededGridUpdate);
-    gridClassName = gridClassName.charAt(gridClassName.length-1);
-    console.log(gridClassName);
-    if (board[gridClassName-1] === null){
-        board.splice(gridClassName-1, 0, turn);
+    if (isGameOver()) return; 
+    let gridId = e.target.id; 
+    gridId = gridId.charAt(gridId.length-1);
+    if (board[gridId-1] === null){
+        board[gridId-1] = turn;
     } else {
         return; 
     }
-    console.log(board);
-    turn *= -1;
-    
-    render(); 
+    render(e.target); 
 }
 
 function init() {
     board = [null, null, null, null, null, null, null, null, null];
     turn = 1; 
+    gridOnScreen.forEach(function(grids){
+        grids.textContent = ''; 
+    });
+    msgEl.textContent = 'The battle of Os and Xs begins...'
+    //turnEl.textConent = 'Turn';
+    replayEl.style.visibility = 'hidden';
 }
 
-function render(){
-    //update grid
-    /*const grids = document.querySelectorAll('div');
-    for (let grid of grids) {
-        if (turn = 1){
-            grid.textContent = 'X';
-            console.log(grid.textConent);
-        }
-    }
-    */
-    gridEl.textConent = 'X';    
-        
+function render(element) {
+    element.textContent = turn > 0 ? player1.sign : player2.sign;    
     renderMessage(); 
+    turn *= -1;
     replayEl.style.visibility = isGameOver() ? 'visible' : 'hidden';
 }
 
 function isGameOver() {
     for (let i = 0; i < WINNING_IDX.length; i++) {
-        if (Math.abs(board[WINNING_IDX[i][0]] + board[WINNING_IDX[i][1] + board[WINNING_IDX[i][2]]]) === 3) {
-            return turn; //winner
-        } else if (board[i] === null){
-            return false; //in game
-        } else {
-            return 'Tied'; 
-        }
+        if (Math.abs(board[WINNING_IDX[i][0]] + board[WINNING_IDX[i][1]] + board[WINNING_IDX[i][2]]) === 3) {
+            return 'winner';
+        } 
+    }
+    if (board.includes(null) === false) {
+        return 'tied'
+    } else {
+        return false; 
     }
 }
 
-function renderMessage(){
-    let result = isGameOver(); 
-    if (result === turn) {
-        msgEl.textContent = 'Player wins!';
-    } else if (result === 'Tied') {
+
+function renderMessage() {
+    if (isGameOver() === 'winner') {
+        msgEl.textContent = `Player ${turn === 1 ? 1 : 2} Wins!`;
+    } else if (isGameOver() === 'tied') {
         msgEl.textContent = 'Tied!';
     } else {
         msgEl.textContent = 'Keep going!';
     }
-    
 }
 
 init();
