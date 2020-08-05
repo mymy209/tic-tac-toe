@@ -13,20 +13,16 @@ const WINNING_IDX = [
     [0, 4, 8],
     [2, 4, 6]
 ];
-/*----- app's state (variables) -----*/
-let board = [];
-
 const player1 = {
-    name: '', 
     sign: 'O'
 };
 const player2 = {
-    name: '',
     sign: 'X'
 };
 
+/*----- app's state (variables) -----*/
+let board;
 let turn; 
-
 
 /*----- cached element references -----*/
 const msgEl = document.getElementById('msg');
@@ -48,18 +44,18 @@ function handleGridClick(e) {
     } else {
         return; 
     }
+  
     render(e.target); 
 }
 
 function init() {
     board = [null, null, null, null, null, null, null, null, null];
     turn = 1; 
-    gridOnScreen.forEach(function(grids){
-        grids.textContent = ''; 
-    });
     msgEl.textContent = 'The battle of Os and Xs begins...'
-    //turnEl.textConent = 'Turn';
-    replayEl.style.visibility = 'hidden';
+    gridOnScreen.forEach(function(grid){
+        grid.textContent = '';
+    })
+    
 }
 
 function render(element) {
